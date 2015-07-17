@@ -1,0 +1,28 @@
+{
+  "name": "pg-trans",
+  "description": "A framework for running transactions using 'pg' (and getting them right).",
+  "version": "0.1.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "set -e; eslint *.js test/*.js; tape test/*.js;"
+  },
+  "devDependencies": {
+    "eslint": "^0.24.1",
+    "pg": "^4.4.0",
+    "tape": "^4.0.0"
+  },
+  "dependencies": {
+    "async": "^1.3.0"
+  },
+  "homepage": "https://github.com/chilts/pg-trans",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/chilts/pg-trans.git"
+  },
+  "author": {
+    "name": "Andrew Chilton",
+    "email": "andychilton@gmail.com",
+    "url": "http://chilts.org/"
+  },
+  "license": "ISC"
+}

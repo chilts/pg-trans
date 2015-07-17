@@ -1,0 +1,28 @@
+{
+  "env": {
+    "node": true
+  },
+  "rules": {
+    "indent": [ 2, 2 ],
+    "quotes": [ 2, "single" ],
+    "linebreak-style": [ 2, "unix" ],
+    "semi": [ 2, "never" ],
+    "key-spacing": [
+      2,
+      {
+        "beforeColon": true,
+        "afterColon": true,
+        "align": "colon"
+      }
+    ],
+    "no-shadow": 2,
+    "brace-style": [ 2, "stroustrup" ],
+    "no-spaced-func": 2,
+    "no-use-before-define": [ 2, "nofunc" ],
+    "eqeqeq": 2,
+    "dot-notation": 0,
+    "curly": [ 2, "multi-line" ],
+    "strict": [ 2, "global" ],
+    "comma-dangle": [ 2, "always-multiline" ]
+  }
+}
