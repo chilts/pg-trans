@@ -34,6 +34,9 @@ function trans(pg, conStr, statements, callback) {
           statements,
           function(statement, doneStatement) {
             var name = statement.name
+            if ( !name ) {
+              throw new Error('pg-trans: every statement must provide a \'name\'')
+            }
 
             // start the 'query' for the client.query()
             var query = {}
