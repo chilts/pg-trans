@@ -1,4 +1,17 @@
+# Pg Trans #
 
+A framework for running transactions using 'pg' (and getting them right).
+
+The abilities of this package are:
+
+* start a transaction
+* run each statement in turn
+* check each result (and quit half-way if wanted)
+* munge each result if required
+* save the result of every statement
+* commit the transaction if everything was successful
+* rollback properly in case of error at any point
+* discard the client back to the pool in all success and error cases
 
 ## Synopsis ##
 
@@ -8,25 +21,31 @@ var trans = require('pg-trans')(pg, conStr)
 
 trans(
   [
-    'CREATE TABLE foo(bar TEXT)',
     {
+      name : 'create',
+      sql  : 'CREATE TABLE foo(bar TEXT)',
+    },
+    {
+      name : 'insert',
       sql : "INSERT INTO foo(bar) VALUES($1)",
       vals : [ 'Hello, World!' ],
     }
     {
+      name : 'select',
       sql : 'SELECT * FROM foo',
-    }
-    {
-      sql : 'SELECT * FROM foo',
-      res : function(rows) {
-        return rows
-      }
     }
   ],
   function(err, result) {
-    // check err
-    // rows contains the result of the last query
-    // result is equal to : [ [], [], [ { } ] ]
+    // check err as usual
+
+    // result is equivalent to:
+    var res = {
+      begin  : [],
+      create : [],
+      insert : [],
+      select : [{ bar : 'Hello, World!' }],
+      commit : [],
+    }
   }
 )
 ```
@@ -90,6 +109,9 @@ See all of the [tests](https://github.com/chilts/pg-trans/tree/master/test) if y
 
 ## History ##
 
+* v0.3.0 (2015-07-19)
+  * convert evverything to use a result object of arrays, not an array of arrays
+  * updated docs
 * v0.2.0 (2015-07-18)
   * ability to call a '.check()' function at each stage
   * more tests
