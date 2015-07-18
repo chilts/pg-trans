@@ -52,6 +52,7 @@ Each action must have the `sql` for the statement. All other attributes are opti
 
 * sql (required) - the sql statement to be executed
 * vals (optional) - the values for the placeholders in the sql (default: [])
+* check (optional) - a function to run to check everything is ok (return a true value (an error) to rollback the transaction)
 * res (optional) - a function to run once the result is known
 
 Note: the `vals` can also be a function which returns an array of vals.
@@ -65,11 +66,12 @@ The process goes through the following:
 3. a loop through all actions is started:
   1. if `vals` is a function, it is called to retrieve the vals to use
   2. the `sql` and `vals` is sent
-  3. when finished, the `res` function is called (if it exists)
-    1. If you return a falsey value from that function, all is good and we continue
-    2. If you return a truthy value (eg. an Error), then we'll roll the transaction back and call callback with that value
+  3. the `check` function is called (if it exists). Return an error to stop the transaction and rollback (falsey to continue)..
+  4. finally, the `res` function is called (if it exists). Whatever you return will be saved instead of the actual rows returned.
 4. a `COMMIT` is sent
 
 If at any stage an error occurs, then a `ROLLBACK` is sent and the callback called with the error provided.
+
+See all of the [tests](https://github.com/chilts/pg-trans/tree/master/test) if you want to see how anything works.
 
 (Ends)

@@ -62,10 +62,36 @@ function trans(pg, conStr, statements, callback) {
 
             // run this query
             client.query(query, function(err, res) {
-              if (err) return doneStatement(err)
+              if (err) {
+                results.push(undefined)
+                return doneStatement(err)
+              }
 
-              // now that we have a result, see if we need to call the 'res' function
+              // get the result rows
               var rows = res.rows
+
+              // now that we have a result, call the 'check' function (if available)
+              if ( statement.check ) {
+                var errCheck = statement.check(rows)
+                if ( errCheck ) {
+                  // yes, the user wants us to rollback and stop
+                  client.query('rollback', function(errRollback) {
+                    // if there was an additional error on rollback, just output a warning
+                    if (errRollback) {
+                      console.warn(errRollback)
+                    }
+                    doneWithClient()
+
+                    // send back this error, but also all the results so far (including this one)
+                    results.push(rows)
+                    return doneStatement(errCheck)
+                  })
+                  return
+                }
+                // this check passed, so carry on
+              }
+
+              // call the 'res' function (for munging or so the user can extract data)
               if ( statement.res ) {
                 // Note: this function MUST be synchronous
                 rows = statement.res(rows)
@@ -91,7 +117,8 @@ function trans(pg, conStr, statements, callback) {
             console.warn(errRollback)
           }
           doneWithClient()
-          return callback(err)
+          // also return the results so far
+          return callback(err, results.slice(1))
         })
         return
       }
