@@ -16,11 +16,17 @@ var trans = pgTrans(pg, 'postgres://postgres@localhost:5432/acme')
 test('run a query with an invalid syntax', function(t) {
   t.plan(3)
 
-  var expectedRes = [ undefined ]
+  var expectedRes = {
+    begin : [],
+    bad   : undefined,
+  }
 
   trans(
     [
-      'SELECT blah',
+      {
+        name : 'bad',
+        sql  : 'SELECT blah',
+      },
     ],
     function(err, res) {
       t.ok(err, 'There was an error with this transaction')
@@ -34,14 +40,21 @@ test('run a query with an invalid syntax', function(t) {
 test('create a table, insert a row, cause a syntax error (and rollback) - select for this row', function(t) {
   t.plan(6)
 
-  var expectedRes1 = [ [], undefined ]
-  var expectedRes2 = [ undefined ]
+  var expectedRes1 = {
+    begin  : [],
+    create : [],
+    bad    : undefined,
+  }
+  var expectedRes2 = {
+    begin : [],
+    bad   : undefined,
+  }
   var expectedErr2 = 'error: relation "foo" does not exist'
 
   trans(
     [
-      'CREATE TABLE foo (bar TEXT)',
-      'SELECT blah',
+      { name : 'create', sql : 'CREATE TABLE foo (bar TEXT)' },
+      { name : 'bad', sql : 'SELECT blah' },
     ],
     function(err1, res1) {
       t.ok(err1, 'There was an error with this transaction')
@@ -50,7 +63,7 @@ test('create a table, insert a row, cause a syntax error (and rollback) - select
 
       // now let's select the rows from 'foo' - the table and rows shouldn't even exist
       trans(
-        [ 'SELECT * FROM foo' ],
+        [ { name : 'bad', sql : 'SELECT * FROM foo' } ],
         function(err2, res2) {
           t.ok(err2, 'There was an error with this transaction')
           t.equal('' + err2, expectedErr2, 'The error message is as expected')

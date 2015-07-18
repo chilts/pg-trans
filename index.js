@@ -8,16 +8,16 @@ var async = require('async')
 // --------------------------------------------------------------------------------------------------------------------
 
 function trans(pg, conStr, statements, callback) {
+  // wrap all these statements in a transaction
+  statements.unshift({ name : 'begin', sql : 'begin' })
+  statements.push({ name : 'commit', sql : 'commit' })
+
   // save the 'client' and 'done' once we have connected
   var client
   var doneWithClient
 
   // store all the results
-  var results = []
-
-  // wrap all these statements in a transaction
-  statements.unshift({ sql : 'begin' })
-  statements.push({ sql : 'commit' })
+  var results = {}
 
   async.series(
     [
@@ -33,6 +33,8 @@ function trans(pg, conStr, statements, callback) {
         async.eachSeries(
           statements,
           function(statement, doneStatement) {
+            var name = statement.name
+
             // start the 'query' for the client.query()
             var query = {}
             if ( typeof statement === 'string' ) {
@@ -63,7 +65,7 @@ function trans(pg, conStr, statements, callback) {
             // run this query
             client.query(query, function(err, res) {
               if (err) {
-                results.push(undefined)
+                results[name] = undefined
                 return doneStatement(err)
               }
 
@@ -83,7 +85,7 @@ function trans(pg, conStr, statements, callback) {
                     doneWithClient()
 
                     // send back this error, but also all the results so far (including this one)
-                    results.push(rows)
+                    results[name] = rows
                     return doneStatement(errCheck)
                   })
                   return
@@ -98,7 +100,7 @@ function trans(pg, conStr, statements, callback) {
               }
 
               // remember this result
-              results.push(rows)
+              results[name] = rows
 
               // finally, we're finished with this particular statement
               doneStatement()
@@ -118,7 +120,7 @@ function trans(pg, conStr, statements, callback) {
           }
           doneWithClient()
           // also return the results so far
-          return callback(err, results.slice(1))
+          return callback(err, results)
         })
         return
       }
@@ -127,7 +129,7 @@ function trans(pg, conStr, statements, callback) {
       doneWithClient()
 
       // [].slice() is `.slice(begin, end)` which is why it's just '-1' and not '-2'
-      callback(null, results.slice(1, statements.length - 1))
+      callback(null, results)
     }
   )
 }

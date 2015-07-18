@@ -8,11 +8,25 @@ var trans = require('pg-trans')(pg, conStr)
 
 trans(
   [
-    // ...
+    'CREATE TABLE foo(bar TEXT)',
+    {
+      sql : "INSERT INTO foo(bar) VALUES($1)",
+      vals : [ 'Hello, World!' ],
+    }
+    {
+      sql : 'SELECT * FROM foo',
+    }
+    {
+      sql : 'SELECT * FROM foo',
+      res : function(rows) {
+        return rows
+      }
+    }
   ],
-  function(err, rows) {
+  function(err, result) {
     // check err
     // rows contains the result of the last query
+    // result is equal to : [ [], [], [ { } ] ]
   }
 )
 ```

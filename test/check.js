@@ -20,13 +20,23 @@ test('run a query but make sure we do not run the second', function(t) {
   var expectedRows = [
     { bool : true },
   ]
-  var expectedRes = [ expectedRows, expectedRows ]
+  var expectedRes = {
+    begin : [],
+    one   : expectedRows,
+    two   : expectedRows,
+    // three  \_ We say to quit prior to
+    // commit /  these being executed.
+  }
   var errMsg = 'Pretending that something went wrong'
 
   trans(
     [
-      'SELECT True AS bool',
       {
+        name : 'one',
+        sql  : 'SELECT True AS bool',
+      },
+      {
+        name  : 'two',
         sql   : 'SELECT True AS bool',
         check : function(rows) {
           // firstly, make sure i is still 0
@@ -41,7 +51,10 @@ test('run a query but make sure we do not run the second', function(t) {
           t.fail('This .res() function should not be called at all')
         },
       },
-      'SELECT True AS bool',
+      {
+        name : 'three',
+        sql  : 'SELECT True AS bool',
+      },
     ],
     function(err, res) {
       t.ok(err, 'There was an error with this transaction')
