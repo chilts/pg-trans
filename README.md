@@ -74,4 +74,22 @@ If at any stage an error occurs, then a `ROLLBACK` is sent and the callback call
 
 See all of the [tests](https://github.com/chilts/pg-trans/tree/master/test) if you want to see how anything works.
 
+## History ##
+
+* v0.2.0 (2015-07-18)
+  * ability to call a '.check()' function at each stage
+  * more tests
+* v0.1.0 (2015-07-17)
+  * tests for most non-error paths
+  * initial version
+
+## AUTHOR ##
+
+Written by [Andrew Chilton](http://chilts.org/):
+
+* [Blog](http://chilts.org/)
+* [GitHub](https://github.com/chilts)
+* [Twitter](https://twitter.com/andychilton)
+* [Instagram](http://instagram.com/thechilts)
+
 (Ends)
