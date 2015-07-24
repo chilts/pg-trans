@@ -109,6 +109,8 @@ See all of the [tests](https://github.com/chilts/pg-trans/tree/master/test) if y
 
 ## History ##
 
+* v0.4.0 (2015-07-24)
+  * pass all the results (so far) ino the vals() function
 * v0.3.0 (2015-07-19)
   * convert evverything to use a result object of arrays, not an array of arrays
   * updated docs
