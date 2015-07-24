@@ -53,10 +53,10 @@ function trans(pg, conStr, statements, callback) {
             if ( statement.vals ) {
               if ( typeof statement.vals === 'function' ) {
                 // call this function and use the returned array
-                query.values = statement.vals()
+                query.values = statement.vals(results)
               }
               else if ( Array.isArray(statement.vals) ) {
-                // call this function and use the returned array
+                // use this array as-is
                 query.values = statement.vals
               }
               else {
